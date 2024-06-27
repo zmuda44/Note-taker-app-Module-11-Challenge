@@ -5,6 +5,7 @@ const {
   readAndAppend,
   writeToFile,
 } = require('../helpers/fsUtils');
+const fs = require('fs')
 
 // GET Route for retrieving all the tips
 notes.get('/', (req, res) => {
@@ -31,6 +32,27 @@ notes.post('/', (req, res) => {
     res.error('Error in adding tip');
   }
 });
+
+notes.delete('/:id', async (req, res) => {
+  const noteId = req.params.id
+
+  fs.readFile('./db/db.json', 'utf8', (error, data) => {
+    error ? console.log(error) : console.log('nothing')
+    let notesData = JSON.parse(data)
+    for (note of notesData) {
+      if(note.id == noteId) {
+        notesData.splice(notesData.indexOf(note), 1);        
+      }
+    }
+
+    return fs.writeFile('./db/db.json', JSON.stringify(notesData), (err) => {
+      err ? console.log(err) : console.log(notesData)
+    })   
+  })
+
+  res.redirect('/') 
+}
+)
 
 module.exports = notes;
 
